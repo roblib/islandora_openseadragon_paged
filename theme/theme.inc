@@ -14,6 +14,7 @@
 function template_preprocess_islandora_paged_seadragon_viewer(array &$variables) {
   module_load_include('inc', 'islandora', 'includes/authtokens');
   module_load_include('inc', 'islandora_openseadragon', 'includes/utilities');
+  $datastream_id = 'JP2';
 
   $pages = $variables['pages'];
   $library_path = libraries_get_path('openseadragon');
@@ -24,15 +25,8 @@ function template_preprocess_islandora_paged_seadragon_viewer(array &$variables)
   // Populate tileSources with pages.
   $identifiers = array();
   foreach ($pages as $pid => $page) {
-    // @NOTE: islandora_openseadragon_identifier_tile_source() is deprecated, see Islandora OSD v1.11, inc/utilies.inc.
-    $tile_source = islandora_openseadragon_identifier_tile_source(
-      url("islandora/object/{$pid}/datastream/JP2/view", array(
-        'absolute' => TRUE,
-        'query' => array(
-          'token' => islandora_get_object_token($pid, 'JP2', 2),
-        ),
-      )
-    ));
+    $token = islandora_get_object_token($pid, $datastream_id, 2);
+    $tile_source = islandora_openseadragon_tile_source($pid, $datastream_id, $token);
     $tile_source['overlays'] = islandora_openseadragon_viewer_query_solr_for_overlays($pid);
     $variables['tile_sources'][] = $tile_source;
   }
